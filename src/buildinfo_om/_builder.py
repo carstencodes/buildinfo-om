@@ -205,7 +205,7 @@ def _create_builder(
             f"{arg_name}: {arg_type.__qualname__ if isclass(arg_type) else str(arg_type)}"
         )
         if field.name == "requestedBy":
-            arg = f"{arg_name}: list[str]"
+            arg = f"{arg_name}: tuple[str]"
 
         signature: str = f"{function_name}(self, {arg}) -> Self"
 
