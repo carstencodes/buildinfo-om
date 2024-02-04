@@ -1,0 +1,40 @@
+[project]
+name = "buildinfo-om"
+version = "0.1.0"
+description = "JFrog BuildInfo ObjectModel written in python"
+authors = [
+    {name = "Carsten Igel", email = "cig@bite-that-bit.de"},
+]
+dependencies = [
+    "pydantic>=2.6.0",
+    "dacite>=1.8.1",
+    "makefun>=1.15.2",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {file = "LICENSE"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+get-schema = "curl https://raw.githubusercontent.com/jfrog/build-info-go/6d8e36041ae4263c97d5984cdc7cebbdd7c04112/buildinfo-schema.json -o schema/build-info.schema.json"
+create-om = "datamodel-codegen --input schema/build-info.schema.json --custom-file-header-path .licenseheader --output src/buildinfo_om/_model.py --output-model-type dataclasses.dataclass --enum-field-as-literal all --field-constraints --set-default-enum-member --strict-types str bytes int float bool --use-annotated --use-generic-container-types --use-non-positive-negative-number-constrained-types --use-double-quotes --use-standard-collections --use-subclass-enum --use-union-operator --capitalise-enum-members --use-default-kwarg --use-field-description --disable-appending-item-suffix --enable-version-header --target-python-version 3.11 --use-schema-description --use-title-as-name --no-color --input-file-type jsonschema"
+docs = "mkdocs build -c -s -v"
+
+
+[tool.pdm.dev-dependencies]
+build = [
+    "datamodel-code-generator[http]>=0.25.3",
+]
+docs = [
+    "mkdocs>=1.5.3",
+    "mkdocstrings[python]>=0.24.0",
+]
+style = [
+    "mypy>=1.8.0",
+]
