@@ -6,7 +6,6 @@ authors = [
     {name = "Carsten Igel", email = "cig@bite-that-bit.de"},
 ]
 dependencies = [
-    "pydantic>=2.6.0",
     "dacite>=1.8.1",
     "makefun>=1.15.2",
 ]
