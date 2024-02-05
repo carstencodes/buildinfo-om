@@ -358,10 +358,11 @@ class BuildInfoBuilder(_BuildInfoBuilder):
 
         Parameters
         ----------
-        additional_properties
+        additional_properties: Mapping[str, Any]
 
         Returns
         -------
+        Self
 
         """
         properties: dict[str, str] = additional_properties
@@ -375,11 +376,12 @@ class BuildInfoBuilder(_BuildInfoBuilder):
 
         Parameters
         ----------
-        keys
-        additional_properties
+        keys: tuple[str, ...]
+        additional_properties: Mapping[str, Any]
 
         Returns
         -------
+        Self
 
         """
         properties: dict[str, str] = additional_properties

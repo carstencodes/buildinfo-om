@@ -60,10 +60,11 @@ def load_from_file(path: PathLike) -> BuildInfo:
 
     Parameters
     ----------
-    path
+    path: PathLike
 
     Returns
     -------
+    BuildInfo
 
     """
     with open(path, "r", encoding="utf-8") as buffer:
@@ -75,10 +76,11 @@ def load_from_buffer(buf: TextIO) -> BuildInfo:
 
     Parameters
     ----------
-    buf
+    buf: TextIO
 
     Returns
     -------
+    BuildInfo
 
     """
     data: str | bytes = buf.read()
@@ -90,10 +92,11 @@ def load_from_str(value: str | bytes | bytearray) -> BuildInfo:
 
     Parameters
     ----------
-    value
+    value: str | bytes | bytearray
 
     Returns
     -------
+    BuildInfo
 
     """
     data: Any = loads(value)
@@ -108,10 +111,11 @@ def load_from_dict(data: Mapping[str, Any]) -> BuildInfo:
 
     Parameters
     ----------
-    data
+    data: Mapping[str, Any]
 
     Returns
     -------
+    BuildInfo
 
     """
     cfg: Config = Config()
@@ -127,11 +131,12 @@ def save_to_file(bi: BuildInfo, path: PathLike) -> None:
 
     Parameters
     ----------
-    bi
-    path
+    bi: BuildInfo
+    path: PathLike
 
     Returns
     -------
+    None
 
     """
     with open(path, "w+", encoding="utf-8") as buffer:
@@ -143,11 +148,12 @@ def save_to_buffer(bi: BuildInfo, buffer: TextIO) -> None:
 
     Parameters
     ----------
-    bi
-    buffer
+    bi: BuildInfo
+    buffer: TextIO
 
     Returns
     -------
+    None
 
     """
     data: str = transform_to_str(bi)
@@ -159,10 +165,11 @@ def transform_to_str(bi: BuildInfo) -> str:
 
     Parameters
     ----------
-    bi
+    bi: BuildInfo
 
     Returns
     -------
+    str
 
     """
     data: Mapping[str, Any] = transform_to_mapping(bi)
@@ -174,10 +181,11 @@ def transform_to_mapping(bi: BuildInfo) -> Mapping[str, Any]:
 
     Parameters
     ----------
-    bi
+    bi: BuildInfo
 
     Returns
     -------
+    Mapping[str, Any]
 
     """
     data: Mapping[str, Any] = asdict(bi)

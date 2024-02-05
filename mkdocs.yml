@@ -1,0 +1,23 @@
+site_name: Build-Info Object Model
+nav:
+  - Home: 'index.md'
+  - 'BuildInfo ObjectModel':
+       - DataModel: 'buildinfo-om.md'
+theme:
+  name: readthedocs
+  nav_style: dark
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - rust
+plugins:
+- autorefs:
+- mkdocstrings:
+    enabled: true
+    enable_inventory: true
+    default_handler: python
+    handlers:
+      python:
+        paths: [src]
+        docstring_style: numpy
+        show_if_no_docstring: true
