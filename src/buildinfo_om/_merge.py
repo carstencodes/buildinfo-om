@@ -1,7 +1,11 @@
 #
+#
 # SPDX-Identifier: Apache 2.0 OR MIT
 #
-# Copyright (C) 2024 Carsten Igel
+# Copyright (c) 2024 Carsten Igel.
+#
+# This file is part of pdm-bump
+# (see https://github.com/carstencodes/pdm-bump).
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,8 +28,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,6 +38,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
 #
 
 
@@ -63,7 +68,7 @@ class NonSameSetsOfProperties(IntEnum):
 def merge_build_info(
     *items: BuildInfo,
     different_data: NonUniqueBuilds = NonUniqueBuilds.Skip,
-    different_properties: NonSameSetsOfProperties = NonSameSetsOfProperties.Skip,
+    different_propss: NonSameSetsOfProperties = NonSameSetsOfProperties.Skip,
 ) -> BuildInfo:
     """
     Merge two or more builds to a new build.
@@ -79,12 +84,14 @@ def merge_build_info(
     result.vcs = _select_vcs(*filtered_items)
     result.buildAgent = _unify_build_agent(*filtered_items)
     result.agent = _unify_agent(*filtered_items)
-    result.started, result.durationMillis = _sum_up_build_duration(*filtered_items)
+    result.started, result.durationMillis = _sum_up_build_duration(
+        *filtered_items
+    )
     result.modules = _combine_modules(*filtered_items)
     result.url = _select_url(*filtered_items)
     result.type = _select_type(*filtered_items)
     result.issues = _combine_issues(*filtered_items)
-    result.properties = _combine_properties(different_properties, *filtered_items)
+    result.properties = _combine_properties(different_propss, *filtered_items)
     result.principal = _select_principal(*filtered_items)
 
     return result
@@ -119,11 +126,15 @@ def __combine_sequence(*items: Sequence[_T]) -> Sequence[_T] | None:
 
 
 def _select_name(*items: BuildInfo) -> str | None:
-    return __unique_or_first(*tuple({b.name for b in items if b.name is not None}))
+    return __unique_or_first(
+        *tuple({b.name for b in items if b.name is not None})
+    )
 
 
 def _select_number(*items: BuildInfo) -> str | None:
-    return __unique_or_first(*tuple({b.number for b in items if b.number is not None}))
+    return __unique_or_first(
+        *tuple({b.number for b in items if b.number is not None})
+    )
 
 
 def _select_version(*items: BuildInfo) -> str | None:
@@ -133,7 +144,9 @@ def _select_version(*items: BuildInfo) -> str | None:
 
 
 def _select_vcs(*items: BuildInfo) -> Sequence[VCS] | None:
-    return __combine_sequence(*tuple([b.vcs for b in items if b.vcs is not None]))
+    return __combine_sequence(
+        *tuple([b.vcs for b in items if b.vcs is not None])
+    )
 
 
 def _unify_build_agent(*items: BuildInfo) -> BuildAgent | None:
@@ -152,7 +165,9 @@ def _unify_build_agent(*items: BuildInfo) -> BuildAgent | None:
 
 
 def _unify_agent(*items: BuildInfo) -> Agent | None:
-    agents: tuple[Agent, ...] = tuple([b.agent for b in items if b.agent is not None])
+    agents: tuple[Agent, ...] = tuple(
+        [b.agent for b in items if b.agent is not None]
+    )
     agent: Agent = Agent()
     agent.name = __unique_or_combined(
         *tuple([a.name for a in agents if a.name is not None])
@@ -172,11 +187,15 @@ def _combine_modules(*items: BuildInfo) -> Sequence[Module] | None:
 
 
 def _select_url(*items: BuildInfo) -> str | None:
-    return __unique_or_combined(*tuple({b.url for b in items if b.url is not None}))
+    return __unique_or_combined(
+        *tuple({b.url for b in items if b.url is not None})
+    )
 
 
 def _select_type(*items: BuildInfo) -> str | None:
-    return __unique_or_combined(*tuple({b.type for b in items if b.type is not None}))
+    return __unique_or_combined(
+        *tuple({b.type for b in items if b.type is not None})
+    )
 
 
 def _combine_issues(*items: BuildInfo) -> Issues | None:
@@ -207,7 +226,8 @@ def __push_to_new_issue(
 ) -> None:
     if current_issue.aggregateBuildIssues is not None:
         new_issues.aggregateBuildIssues = (
-            current_issue.aggregateBuildIssues and new_issues.aggregateBuildIssues
+            current_issue.aggregateBuildIssues
+            and new_issues.aggregateBuildIssues
             if new_issues.aggregateBuildIssues is not None
             else current_issue.aggregateBuildIssues
         )
@@ -239,7 +259,10 @@ def _combine_properties(
                 properties[key] = set()
                 properties[key].add(item.properties[key])
             elif __can_combine_current_property_set(
-                different_properties, key, properties[key], item.properties[key]
+                different_properties,
+                key,
+                properties[key],
+                item.properties[key],
             ):
                 deleted.add(key)
                 _ = properties.pop(key, None)
@@ -294,7 +317,11 @@ def _sum_up_build_duration(*items: BuildInfo) -> tuple[str | None, int | None]:
     starts_and_ends: list[tuple[datetime | None, datetime | None]] = [
         (
             start if start is not None else None,
-            start + duration if start is not None and duration is not None else None,
+            (
+                start + duration
+                if start is not None and duration is not None
+                else None
+            ),
         )
         for start, duration in starts_and_durations
     ]
@@ -350,6 +377,7 @@ def _verify_builds(
         [
             build
             for build in items
-            if build.name == first_build.name and build.number == first_build.number
+            if build.name == first_build.name
+            and build.number == first_build.number
         ]
     )

@@ -1,7 +1,11 @@
 #
+#
 # SPDX-Identifier: Apache 2.0 OR MIT
 #
-# Copyright (C) 2024 Carsten Igel
+# Copyright (c) 2024 Carsten Igel.
+#
+# This file is part of pdm-bump
+# (see https://github.com/carstencodes/pdm-bump).
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,8 +28,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,17 +39,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+#
 
-from ._builder import (AffectedIssueBuilder, AgentBuilder, ArtifactBuilder,
-                       BuildAgentBuilder, BuildInfoBuilder, DependencyBuilder,
-                       IssuesBuilder, ModuleBuilder, TrackerBuilder,
-                       VCSBuilder)
-from ._loadsave import (load_from_buffer, load_from_dict, load_from_file,
-                        load_from_str, save_to_buffer, save_to_file,
-                        transform_to_mapping, transform_to_str)
+from ._builder import (
+    AffectedIssueBuilder,
+    AgentBuilder,
+    ArtifactBuilder,
+    BuildAgentBuilder,
+    BuildInfoBuilder,
+    DependencyBuilder,
+    IssuesBuilder,
+    ModuleBuilder,
+    TrackerBuilder,
+    VCSBuilder,
+)
+from ._loadsave import (
+    load_from_buffer,
+    load_from_dict,
+    load_from_file,
+    load_from_str,
+    save_to_buffer,
+    save_to_file,
+    transform_to_mapping,
+    transform_to_str,
+)
 from ._merge import merge_build_info
-from ._model import (AffectedIssue, Agent, Artifact, BuildAgent, Dependency,
-                     Issues, Module, Tracker)
+from ._model import (
+    AffectedIssue,
+    Agent,
+    Artifact,
+    BuildAgent,
+    Dependency,
+    Issues,
+    Module,
+    Tracker,
+)
 from ._vcs import VCS, BuildInfo
 
 __all__ = [

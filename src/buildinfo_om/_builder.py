@@ -1,7 +1,11 @@
 #
+#
 # SPDX-Identifier: Apache 2.0 OR MIT
 #
-# Copyright (C) 2024 Carsten Igel
+# Copyright (c) 2024 Carsten Igel.
+#
+# This file is part of pdm-bump
+# (see https://github.com/carstencodes/pdm-bump).
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,8 +28,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,6 +39,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+#
 
 import collections
 from abc import ABC, abstractmethod
@@ -43,13 +48,33 @@ from functools import partial
 from inspect import isclass
 from os import environ
 from types import new_class
-from typing import (Any, Callable, Generic, Mapping, Self, Sequence, TypeAlias,
-                    TypeVar, Union, cast, get_args, get_origin)
+from typing import (
+    Any,
+    Callable,
+    Generic,
+    Mapping,
+    Self,
+    Sequence,
+    TypeAlias,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+)
 
 from makefun import create_function  # type: ignore
 
-from ._model import (AffectedIssue, Agent, Artifact, BuildAgent, Dependency,
-                     Issues, Module, Tracker)
+from ._model import (
+    AffectedIssue,
+    Agent,
+    Artifact,
+    BuildAgent,
+    Dependency,
+    Issues,
+    Module,
+    Tracker,
+)
 from ._vcs import VCS, BuildInfo
 
 TModel = TypeVar(
@@ -90,7 +115,9 @@ _FluentFunctionType = Callable[[Any, str, _FluentFunctArgsType], Any]
 
 def _make_non_optional_type(t: type) -> type:
     if get_origin(t) is Union and type(None) in get_args(t):
-        return cast(type, tuple([a for a in get_args(t) if a is not type(None)]))
+        return cast(
+            type, tuple([a for a in get_args(t) if a is not type(None)])
+        )
 
     return t
 
@@ -129,7 +156,8 @@ def _determine_fluent_function(
     field_type = field.type
     # Strange behavior: dataclass removes all inspections from field type
     # So: Make type non-optional
-    from typing import get_origin, get_args
+    from typing import get_args, get_origin
+
     field_type = _make_non_optional_type(field_type)
 
     if is_dataclass(field_type):
@@ -159,8 +187,16 @@ def _determine_fluent_function(
                 )
             else:
                 arg_name = "*values"
-                return cast(_FluentFunctionType, with_sequence), arg_name, field_type
-        return cast(_FluentFunctionType, with_sequence), "*values", Any  # type: ignore
+                return (
+                    cast(_FluentFunctionType, with_sequence),
+                    arg_name,
+                    field_type,
+                )
+        return (
+            cast(_FluentFunctionType, with_sequence),
+            "*values",
+            Any,
+        )  # type: ignore
     else:
         return cast(_FluentFunctionType, with_scalar), "value", field_type
 
@@ -178,7 +214,7 @@ def _create_builder(
 
     update_ns: dict = {}
 
-    def __init__(self) -> None:
+    def __init__(self) -> None:  # noqa: N807
         self.__args: _BuildArguments = _BuildArguments()  # type: ignore
 
     def build(self) -> TModel:
@@ -192,9 +228,10 @@ def _create_builder(
             field, additional_builders
         )
 
-        arg: str = (
-            f"{arg_name}: {arg_type.__qualname__ if isclass(arg_type) else str(arg_type)}"
+        arg_type_name = (
+            arg_type.__qualname__ if isclass(arg_type) else str(arg_type)
         )
+        arg: str = f"{arg_name}: {arg_type_name}"
         if field.name == "requestedBy":
             arg = f"{arg_name}: tuple[str]"
 
@@ -204,7 +241,9 @@ def _create_builder(
 
         update_ns[function_name] = create_function(signature, target_func)
 
-    update_ns[__init__.__name__] = create_function("__init__(self) -> None", __init__)
+    update_ns[__init__.__name__] = create_function(
+        "__init__(self) -> None", __init__
+    )
     update_ns[build.__name__] = create_function(
         f"build(self) -> {entity_type.__qualname__}", build
     )
