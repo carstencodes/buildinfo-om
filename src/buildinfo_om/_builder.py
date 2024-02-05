@@ -44,11 +44,9 @@ from inspect import isclass
 from os import environ
 from types import new_class
 from typing import (Any, Callable, Generic, Mapping, Self, Sequence, TypeAlias,
-                    TypeVar, cast, get_args, get_origin)
+                    TypeVar, Union, cast, get_args, get_origin)
 
 from makefun import create_function  # type: ignore
-
-import buildinfo_om
 
 from ._model import (AffectedIssue, Agent, Artifact, BuildAgent, Dependency,
                      Issues, Module, Tracker)
@@ -90,18 +88,10 @@ _FluentFunctArgsType = Any | tuple[Any, ...] | Mapping[Any, Any]
 _FluentFunctionType = Callable[[Any, str, _FluentFunctArgsType], Any]
 
 
-def _make_non_optional_type(t: type, additional_builders: _BuilderCollection) -> type:
-    type_repr = str(t)
-    type_repr = type_repr.replace("| None", "").replace("|None", "")
-    type_repr = type_repr.replace("None|", "").replace("None|", "")
-    if type_repr != str(t):
-        __globals = {
-            "Sequence": collections.abc.Sequence,
-            "Mapping": collections.abc.Mapping,
-            "collections": collections,
-            "buildinfo_om": buildinfo_om,
-        }
-        return eval(type_repr, __globals, additional_builders)
+def _make_non_optional_type(t: type) -> type:
+    if get_origin(t) is Union and type(None) in get_args(t):
+        return cast(type, tuple([a for a in get_args(t) if a is not type(None)]))
+
     return t
 
 
@@ -139,7 +129,8 @@ def _determine_fluent_function(
     field_type = field.type
     # Strange behavior: dataclass removes all inspections from field type
     # So: Make type non-optional
-    field_type = _make_non_optional_type(field_type, additional_builders)
+    from typing import get_origin, get_args
+    field_type = _make_non_optional_type(field_type)
 
     if is_dataclass(field_type):
         arg_type = _create_builder(field.type, additional_builders)
