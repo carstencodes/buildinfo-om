@@ -41,6 +41,9 @@
 #
 #
 
+"""
+"""
+
 import collections
 from abc import ABC, abstractmethod
 from dataclasses import Field, fields, is_dataclass
@@ -77,7 +80,7 @@ from ._model import (
 )
 from ._vcs import VCS, BuildInfo
 
-TModel = TypeVar(
+TModel = TypeVar(  # pylint: disable=C0103
     "TModel",
     Agent,
     BuildAgent,
@@ -93,15 +96,31 @@ TModel = TypeVar(
 
 
 class _BuildArguments(dict[str, Any]):
+    """ """
+
     def get_build_items(self) -> Mapping[str, Any]:
+        """
+
+        Returns
+        -------
+
+        """
         ro_copy: dict[str, Any] = {}
         ro_copy.update(self)
         return ro_copy
 
 
-class _Builder(ABC, Generic[TModel]):
+class _Builder(ABC, Generic[TModel]):  # pylint: disable=R0903
+    """ """
+
     @abstractmethod
     def build(self) -> TModel:
+        """
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError()
 
 
@@ -114,10 +133,18 @@ _FluentFunctionType = Callable[[Any, str, _FluentFunctArgsType], Any]
 
 
 def _make_non_optional_type(t: type) -> type:
+    """
+
+    Parameters
+    ----------
+    t
+
+    Returns
+    -------
+
+    """
     if get_origin(t) is Union and type(None) in get_args(t):
-        return cast(
-            type, tuple([a for a in get_args(t) if a is not type(None)])
-        )
+        return cast(type, tuple(a for a in get_args(t) if a is not type(None)))
 
     return t
 
@@ -125,51 +152,59 @@ def _make_non_optional_type(t: type) -> type:
 def _determine_fluent_function(
     field: Field, additional_builders: _BuilderCollection
 ) -> tuple[_FluentFunctionType, str, type]:
+    """
+
+    Parameters
+    ----------
+    field
+    additional_builders
+
+    Returns
+    -------
+
+    """
+
     def with_scalar(self, field_name: str, value: Any):
-        my_args: _BuildArguments = self.__args
+        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
         my_args[field_name] = value
         return self
 
     def with_builder(self, field_name: str, builder: _Builder):
-        my_args: _BuildArguments = self.__args
+        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
         my_args[field_name] = builder.build()
         return self
 
     def with_sequence(self, field_name: str, *values: Any):
-        my_args: _BuildArguments = self.__args
-        seq: Sequence = [v for v in values]
+        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        seq: Sequence = list(values)
         my_args[field_name] = seq
         return self
 
     def with_mapping(self, field_name: str, **values: Any):
-        my_args: _BuildArguments = self.__args
+        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
         mapping: Mapping[str, Any] = values
         my_args[field_name] = mapping
         return self
 
     def with_builder_sequence(self, field_name: str, *builders: _Builder):
-        my_args: _BuildArguments = self.__args
+        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
         seq: Sequence = [b.build() for b in builders]
         my_args[field_name] = seq
         return self
 
     field_type = field.type
-    # Strange behavior: dataclass removes all inspections from field type
-    # So: Make type non-optional
-    from typing import get_args, get_origin
-
     field_type = _make_non_optional_type(field_type)
 
     if is_dataclass(field_type):
-        arg_type = _create_builder(field.type, additional_builders)
+        arg_type = _make_builder(field.type, additional_builders)
         arg_name = "builder"
         return cast(_FluentFunctionType, with_builder), arg_name, arg_type
-    elif get_origin(field_type) is collections.abc.Mapping or (
+    if get_origin(field_type) is collections.abc.Mapping or (
         isclass(field_type) and issubclass(field_type, collections.abc.Mapping)
     ):
         args = get_args(field_type)
         return cast(_FluentFunctionType, with_mapping), "**values", args[-1]
-    elif get_origin(field_type) is collections.abc.Sequence or (
+    if get_origin(field_type) is collections.abc.Sequence or (
         isclass(field_type)
         and issubclass(field_type, collections.abc.Sequence)
         and field_type not in (str, bytes, bytearray)
@@ -178,39 +213,50 @@ def _determine_fluent_function(
         if len(args) == 1:
             field_type = args[0]
             if is_dataclass(field_type):
-                arg_type = _create_builder(field_type, additional_builders)
+                arg_type = _make_builder(field_type, additional_builders)
                 arg_name = "*builders"
                 return (
                     cast(_FluentFunctionType, with_builder_sequence),
                     arg_name,
                     arg_type,
                 )
-            else:
-                arg_name = "*values"
-                return (
-                    cast(_FluentFunctionType, with_sequence),
-                    arg_name,
-                    field_type,
-                )
+
+            arg_name = "*values"
+            return (
+                cast(_FluentFunctionType, with_sequence),
+                arg_name,
+                field_type,
+            )
         return (
             cast(_FluentFunctionType, with_sequence),
             "*values",
             Any,
         )  # type: ignore
-    else:
-        return cast(_FluentFunctionType, with_scalar), "value", field_type
+
+    return cast(_FluentFunctionType, with_scalar), "value", field_type
 
 
-def _create_builder(
+def _make_builder(
     entity_type: type[TModel], additional_builders: _BuilderCollection
 ) -> type[_Builder[TModel]]:
+    """
+
+    Parameters
+    ----------
+    entity_type
+    additional_builders
+
+    Returns
+    -------
+
+    """
     if not is_dataclass(entity_type):
         raise TypeError("Not a dataclass type")
 
     entity_name: str = entity_type.__name__
     builder_name: str = f"{entity_name}Builder"
-    if entity_name in __all_builders:
-        return __all_builders[entity_name]
+    if entity_name in additional_builders:
+        return additional_builders[entity_name]
 
     update_ns: dict = {}
 
@@ -218,28 +264,16 @@ def _create_builder(
         self.__args: _BuildArguments = _BuildArguments()  # type: ignore
 
     def build(self) -> TModel:
-        my_builder_args: _BuildArguments = self.__args
+        my_builder_args: _BuildArguments = self.__args  # pylint: disable=W0212
         return cast(TModel, entity_type(**my_builder_args.get_build_items()))
 
     for field in fields(entity_type):
-        function_name: str = f"with_{field.name}"
-
-        target_func, arg_name, arg_type = _determine_fluent_function(
-            field, additional_builders
+        function_name, target_func = _generate_field_setter_function(
+            field,
+            additional_builders,
         )
 
-        arg_type_name = (
-            arg_type.__qualname__ if isclass(arg_type) else str(arg_type)
-        )
-        arg: str = f"{arg_name}: {arg_type_name}"
-        if field.name == "requestedBy":
-            arg = f"{arg_name}: tuple[str]"
-
-        signature: str = f"{function_name}(self, {arg}) -> Self"
-
-        target_func = partial(target_func, field_name=field.name)
-
-        update_ns[function_name] = create_function(signature, target_func)
+        update_ns[function_name] = target_func
 
     update_ns[__init__.__name__] = create_function(
         "__init__(self) -> None", __init__
@@ -256,25 +290,99 @@ def _create_builder(
     return concrete_class
 
 
-def _make_builder(entity_type: type[TModel]) -> type[_Builder[TModel]]:
-    global __all_builders
-    return _create_builder(entity_type, __all_builders)
+def _generate_field_setter_function(
+    field: Field, additional_builders: _BuilderCollection
+) -> tuple[str, _FluentFunctionType]:
+    """
+
+    Parameters
+    ----------
+    field
+    additional_builders
+
+    Returns
+    -------
+
+    """
+    function_name: str = f"with_{field.name}"
+    target_func, arg_name, arg_type = _determine_fluent_function(
+        field, additional_builders
+    )
+    arg_type_name = (
+        arg_type.__qualname__ if isclass(arg_type) else str(arg_type)
+    )
+    arg: str = f"{arg_name}: {arg_type_name}"
+    if field.name == "requestedBy":
+        arg = f"{arg_name}: tuple[str]"
+    signature: str = f"{function_name}(self, {arg}) -> Self"
+    target_func = partial(target_func, field_name=field.name)
+    target_func = create_function(signature, target_func)
+    return function_name, target_func
 
 
-BuildAgentBuilder: TypeAlias = _make_builder(BuildAgent)  # type: ignore
-AgentBuilder: TypeAlias = _make_builder(Agent)  # type: ignore
-ArtifactBuilder: TypeAlias = _make_builder(Artifact)  # type: ignore
-DependencyBuilder: TypeAlias = _make_builder(Dependency)  # type: ignore
-ModuleBuilder: TypeAlias = _make_builder(Module)  # type: ignore
-TrackerBuilder: TypeAlias = _make_builder(Tracker)  # type: ignore
-AffectedIssueBuilder: TypeAlias = _make_builder(AffectedIssue)  # type: ignore
-IssuesBuilder: TypeAlias = _make_builder(Issues)  # type: ignore
-VCSBuilder: TypeAlias = _make_builder(VCS)  # type: ignore
-_BuildInfoBuilder: TypeAlias = _make_builder(BuildInfo)  # type: ignore
+BuildAgentBuilder: TypeAlias = _make_builder(  # type: ignore
+    BuildAgent, __all_builders
+)
+AgentBuilder: TypeAlias = _make_builder(Agent, __all_builders)  # type: ignore
+ArtifactBuilder: TypeAlias = _make_builder(  # type: ignore
+    Artifact, __all_builders
+)
+DependencyBuilder: TypeAlias = _make_builder(  # type: ignore
+    Dependency, __all_builders
+)
+ModuleBuilder: TypeAlias = _make_builder(  # type: ignore
+    Module, __all_builders
+)
+TrackerBuilder: TypeAlias = _make_builder(  # type: ignore
+    Tracker, __all_builders
+)
+AffectedIssueBuilder: TypeAlias = _make_builder(  # type: ignore
+    AffectedIssue, __all_builders
+)
+IssuesBuilder: TypeAlias = _make_builder(  # type: ignore
+    Issues, __all_builders
+)
+VCSBuilder: TypeAlias = _make_builder(VCS, __all_builders)  # type: ignore
+_BuildInfoBuilder: TypeAlias = _make_builder(  # type: ignore
+    BuildInfo, __all_builders
+)
+
+del __all_builders
 
 
 class BuildInfoBuilder(_BuildInfoBuilder):
+    """ """
+
     def collect_env(self, **additional_properties: Any) -> Self:
+        """
+
+        Parameters
+        ----------
+        additional_properties
+
+        Returns
+        -------
+
+        """
         properties: dict[str, str] = additional_properties
         properties.update(environ)
+        return self.with_properties(**properties)
+
+    def collect_env_without_keys(
+        self, *keys: str, **additional_properties: Any
+    ) -> Self:
+        """
+
+        Parameters
+        ----------
+        keys
+        additional_properties
+
+        Returns
+        -------
+
+        """
+        properties: dict[str, str] = additional_properties
+        properties.update(environ)
+        properties = {k: v for k, v in properties.items() if k not in keys}
         return self.with_properties(**properties)

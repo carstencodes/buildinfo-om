@@ -41,6 +41,9 @@
 #
 #
 
+"""
+"""
+
 
 from dataclasses import asdict
 from json import dumps, loads
@@ -53,16 +56,46 @@ from ._vcs import BuildInfo
 
 
 def load_from_file(path: PathLike) -> BuildInfo:
-    with open(path, "r") as buffer:
+    """
+
+    Parameters
+    ----------
+    path
+
+    Returns
+    -------
+
+    """
+    with open(path, "r", encoding="utf-8") as buffer:
         return load_from_buffer(buffer)
 
 
 def load_from_buffer(buf: TextIO) -> BuildInfo:
+    """
+
+    Parameters
+    ----------
+    buf
+
+    Returns
+    -------
+
+    """
     data: str | bytes = buf.read()
     return load_from_str(data)
 
 
 def load_from_str(value: str | bytes | bytearray) -> BuildInfo:
+    """
+
+    Parameters
+    ----------
+    value
+
+    Returns
+    -------
+
+    """
     data: Any = loads(value)
     transformable_data: Mapping[str, Any] = (
         cast(dict, data) if isinstance(data, dict) else vars(data)
@@ -71,6 +104,16 @@ def load_from_str(value: str | bytes | bytearray) -> BuildInfo:
 
 
 def load_from_dict(data: Mapping[str, Any]) -> BuildInfo:
+    """
+
+    Parameters
+    ----------
+    data
+
+    Returns
+    -------
+
+    """
     cfg: Config = Config()
     cfg.check_types = True
     cfg.strict = True
@@ -80,20 +123,62 @@ def load_from_dict(data: Mapping[str, Any]) -> BuildInfo:
 
 
 def save_to_file(bi: BuildInfo, path: PathLike) -> None:
-    with open(path, "w+") as buffer:
+    """
+
+    Parameters
+    ----------
+    bi
+    path
+
+    Returns
+    -------
+
+    """
+    with open(path, "w+", encoding="utf-8") as buffer:
         save_to_buffer(bi, buffer)
 
 
 def save_to_buffer(bi: BuildInfo, buffer: TextIO) -> None:
+    """
+
+    Parameters
+    ----------
+    bi
+    buffer
+
+    Returns
+    -------
+
+    """
     data: str = transform_to_str(bi)
     buffer.write(data)
 
 
 def transform_to_str(bi: BuildInfo) -> str:
+    """
+
+    Parameters
+    ----------
+    bi
+
+    Returns
+    -------
+
+    """
     data: Mapping[str, Any] = transform_to_mapping(bi)
     return dumps(data)
 
 
 def transform_to_mapping(bi: BuildInfo) -> Mapping[str, Any]:
+    """
+
+    Parameters
+    ----------
+    bi
+
+    Returns
+    -------
+
+    """
     data: Mapping[str, Any] = asdict(bi)
     return data

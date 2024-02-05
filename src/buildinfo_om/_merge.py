@@ -41,6 +41,9 @@
 #
 #
 
+"""
+"""
+
 
 from datetime import datetime, timedelta
 from enum import IntEnum, auto
@@ -52,26 +55,55 @@ from ._vcs import VCS, BuildInfo
 
 
 class NonUniqueBuilds(IntEnum):
-    Ignore = auto()
-    Abort = auto()
-    Skip = auto()
+    """ """
+
+    IGNORE = auto()
+    """
+    """
+    CANCEL = auto()
+    """
+    """
+    SKIP = auto()
+    """
+    """
 
 
 class NonSameSetsOfProperties(IntEnum):
-    Ignore = auto()
-    Abort = auto()
-    Skip = auto()
-    Delete = auto()
-    Join = auto()
+    """ """
+
+    IGNORE = auto()
+    """
+    """
+    CANCEL = auto()
+    """
+    """
+    SKIP = auto()
+    """
+    """
+    DELETE = auto()
+    """
+    """
+    JOIN = auto()
+    """
+    """
 
 
 def merge_build_info(
     *items: BuildInfo,
-    different_data: NonUniqueBuilds = NonUniqueBuilds.Skip,
-    different_propss: NonSameSetsOfProperties = NonSameSetsOfProperties.Skip,
+    different_data: NonUniqueBuilds = NonUniqueBuilds.SKIP,
+    different_propss: NonSameSetsOfProperties = NonSameSetsOfProperties.SKIP,
 ) -> BuildInfo:
     """
-    Merge two or more builds to a new build.
+
+    Parameters
+    ----------
+    items
+    different_data
+    different_propss
+
+    Returns
+    -------
+
     """
 
     filtered_items = _verify_builds(different_data, *items)
@@ -101,20 +133,51 @@ _T = TypeVar("_T")
 
 
 def __unique_or_first(*items: _T) -> _T | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     if len(items) == 0:
         return None
-    else:
-        return items[0]
+
+    return items[0]
 
 
 def __unique_or_combined(*items: _T, separator=", ") -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+    separator
+
+    Returns
+    -------
+
+    """
     if len(items) == 0:
         return None
-    else:
-        return separator.join({str(i) for i in items})
+
+    return separator.join({str(i) for i in items})
 
 
 def __combine_sequence(*items: Sequence[_T]) -> Sequence[_T] | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     if len(items) == 0:
         return None
 
@@ -126,79 +189,179 @@ def __combine_sequence(*items: Sequence[_T]) -> Sequence[_T] | None:
 
 
 def _select_name(*items: BuildInfo) -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __unique_or_first(
         *tuple({b.name for b in items if b.name is not None})
     )
 
 
 def _select_number(*items: BuildInfo) -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __unique_or_first(
         *tuple({b.number for b in items if b.number is not None})
     )
 
 
 def _select_version(*items: BuildInfo) -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __unique_or_first(
         *tuple({b.version for b in items if b.version is not None})
     )
 
 
 def _select_vcs(*items: BuildInfo) -> Sequence[VCS] | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __combine_sequence(
-        *tuple([b.vcs for b in items if b.vcs is not None])
+        *tuple(b.vcs for b in items if b.vcs is not None)
     )
 
 
 def _unify_build_agent(*items: BuildInfo) -> BuildAgent | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     build_agents: tuple[BuildAgent, ...] = tuple(
-        [b.buildAgent for b in items if b.buildAgent is not None]
+        b.buildAgent for b in items if b.buildAgent is not None
     )
     agent: BuildAgent = BuildAgent()
     agent.name = __unique_or_combined(
-        *tuple([a.name for a in build_agents if a.name is not None])
+        *tuple(a.name for a in build_agents if a.name is not None)
     )
     agent.version = __unique_or_combined(
-        *tuple([a.version for a in build_agents if a.version is not None])
+        *tuple(a.version for a in build_agents if a.version is not None)
     )
 
     return agent
 
 
 def _unify_agent(*items: BuildInfo) -> Agent | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     agents: tuple[Agent, ...] = tuple(
-        [b.agent for b in items if b.agent is not None]
+        b.agent for b in items if b.agent is not None
     )
     agent: Agent = Agent()
     agent.name = __unique_or_combined(
-        *tuple([a.name for a in agents if a.name is not None])
+        *tuple(a.name for a in agents if a.name is not None)
     )
     agent.version = __unique_or_combined(
-        *tuple([a.version for a in agents if a.version is not None])
+        *tuple(a.version for a in agents if a.version is not None)
     )
 
     return agent
 
 
 def _combine_modules(*items: BuildInfo) -> Sequence[Module] | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     # TODO merge module inner values
     return __combine_sequence(
-        *tuple([b.modules for b in items if b.modules is not None])
+        *tuple(b.modules for b in items if b.modules is not None)
     )
 
 
 def _select_url(*items: BuildInfo) -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __unique_or_combined(
         *tuple({b.url for b in items if b.url is not None})
     )
 
 
 def _select_type(*items: BuildInfo) -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __unique_or_combined(
         *tuple({b.type for b in items if b.type is not None})
     )
 
 
 def _combine_issues(*items: BuildInfo) -> Issues | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     if len(items) == 0:
         return None
 
@@ -224,6 +387,19 @@ def __push_to_new_issue(
     all_affected_issues: list[AffectedIssue],
     all_aggregated_states: set[str],
 ) -> None:
+    """
+
+    Parameters
+    ----------
+    new_issues
+    current_issue
+    all_affected_issues
+    all_aggregated_states
+
+    Returns
+    -------
+
+    """
     if current_issue.aggregateBuildIssues is not None:
         new_issues.aggregateBuildIssues = (
             current_issue.aggregateBuildIssues
@@ -242,6 +418,17 @@ def __push_to_new_issue(
 def _combine_properties(
     different_properties: NonSameSetsOfProperties, *items: BuildInfo
 ) -> Mapping[str, str] | None:
+    """
+
+    Parameters
+    ----------
+    different_properties
+    items
+
+    Returns
+    -------
+
+    """
     if len(items) == 0:
         return None
 
@@ -276,29 +463,61 @@ def __can_combine_current_property_set(
     items: set[str],
     current: str,
 ) -> bool:
-    if different_properties == NonSameSetsOfProperties.Ignore:
+    """
+
+    Parameters
+    ----------
+    different_properties
+    identifier
+    items
+    current
+
+    Returns
+    -------
+
+    """
+    if different_properties == NonSameSetsOfProperties.IGNORE:
         items.add(current)
-    elif different_properties == NonSameSetsOfProperties.Join:
+    elif different_properties == NonSameSetsOfProperties.JOIN:
         items.add(current)
-    elif different_properties != NonSameSetsOfProperties.Skip:
+    elif different_properties != NonSameSetsOfProperties.SKIP:
         if current not in items:
-            if different_properties == NonSameSetsOfProperties.Abort:
+            if different_properties == NonSameSetsOfProperties.CANCEL:
                 raise ValueError(
                     "Cannot combine properties", identifier, items, current
                 )
-            elif different_properties == NonSameSetsOfProperties.Delete:
-                return False
+            return different_properties != NonSameSetsOfProperties.DELETE
 
     return True
 
 
 def _select_principal(*items: BuildInfo) -> str | None:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     return __unique_or_combined(
         *tuple({b.principal for b in items if b.principal is not None})
     )
 
 
 def _sum_up_build_duration(*items: BuildInfo) -> tuple[str | None, int | None]:
+    """
+
+    Parameters
+    ----------
+    items
+
+    Returns
+    -------
+
+    """
     starts_and_durations: list[tuple[datetime | None, timedelta | None]] = [
         (
             (
@@ -348,7 +567,18 @@ def _sum_up_build_duration(*items: BuildInfo) -> tuple[str | None, int | None]:
 def _verify_builds(
     different_builds: NonUniqueBuilds, *items: BuildInfo
 ) -> tuple[BuildInfo, ...]:
-    if different_builds == NonUniqueBuilds.Ignore:
+    """
+
+    Parameters
+    ----------
+    different_builds
+    items
+
+    Returns
+    -------
+
+    """
+    if different_builds == NonUniqueBuilds.IGNORE:
         return ()
 
     names: set[str] = set()
@@ -360,13 +590,13 @@ def _verify_builds(
         if build.number is not None:
             numbers.add(build.number)
 
-    if different_builds == NonUniqueBuilds.Abort:
+    if different_builds == NonUniqueBuilds.CANCEL:
         if len(names) != 1:
             raise ValueError("Multiple names")
-        elif len(numbers) != 1:
+        if len(numbers) != 1:
             raise ValueError("Multiple numbers")
 
-    if different_builds != NonUniqueBuilds.Skip:
+    if different_builds != NonUniqueBuilds.SKIP:
         raise ValueError("Invalid configuration:", different_builds)
 
     first_build: BuildInfo = tuple(
@@ -374,10 +604,8 @@ def _verify_builds(
     )[0]
 
     return tuple(
-        [
-            build
-            for build in items
-            if build.name == first_build.name
-            and build.number == first_build.number
-        ]
+        build
+        for build in items
+        if build.name == first_build.name
+        and build.number == first_build.number
     )
