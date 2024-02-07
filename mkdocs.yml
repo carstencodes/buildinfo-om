@@ -21,3 +21,6 @@ plugins:
         paths: [src]
         docstring_style: numpy
         show_if_no_docstring: true
+        options:
+          extensions:
+            - griffe_inherited_docstrings

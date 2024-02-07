@@ -81,6 +81,7 @@ build = [
 docs = [
     "mkdocs>=1.5.3",
     "mkdocstrings[python]>=0.24.0",
+    "griffe-inherited-docstrings>=1.0.0",
 ]
 test = [
     "pytest>=7.1.2",

@@ -5,7 +5,7 @@
 groups = ["default", "build", "checkstyle", "docs", "formatting", "release", "static-code-analysis", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:cb32a8d53e4b0dfdb6432b8cb3d654ae87217ba0046b2291434c5e74bdf9c843"
+content_hash = "sha256:f91aebcfac2d01b2a08863af778e7fb0d2192d9fee4658e2a45f4de6a57c2458"
 
 [[package]]
 name = "annotated-types"
@@ -593,6 +593,20 @@ dependencies = [
 files = [
     {file = "griffe-0.40.0-py3-none-any.whl", hash = "sha256:db1da6d1d8e08cbb20f1a7dee8c09da940540c2d4c1bfa26a9091cf6fc36a9ec"},
     {file = "griffe-0.40.0.tar.gz", hash = "sha256:76c4439eaa2737af46ae003c331ab6ca79c5365b552f7b5aed263a3b4125735b"},
+]
+
+[[package]]
+name = "griffe-inherited-docstrings"
+version = "1.0.0"
+requires_python = ">=3.8"
+summary = "Griffe extension for inheriting docstrings."
+groups = ["docs"]
+dependencies = [
+    "griffe>=0.38",
+]
+files = [
+    {file = "griffe_inherited_docstrings-1.0.0-py3-none-any.whl", hash = "sha256:46a7861401022330d39d4e937e52bae4d8b309c943204720d737835214bad8bc"},
+    {file = "griffe_inherited_docstrings-1.0.0.tar.gz", hash = "sha256:ae3e2362af11f1eb95eb81a0ddc744d4fd05649f4ec749ea4559da033d863a46"},
 ]
 
 [[package]]

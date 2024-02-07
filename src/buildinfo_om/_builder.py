@@ -46,11 +46,12 @@
 
 import collections
 from abc import ABC, abstractmethod
-from dataclasses import Field, fields, is_dataclass
+from dataclasses import Field, asdict, fields, is_dataclass
 from functools import partial
 from inspect import isclass
 from os import environ
-from types import new_class
+from re import sub as _substitute
+from types import UnionType, new_class
 from typing import (
     Any,
     Callable,
@@ -95,6 +96,20 @@ TModel = TypeVar(  # pylint: disable=C0103
 )
 
 
+def _to_lower_snake_case(value: str) -> str:
+    """
+
+    Parameters
+    ----------
+    value: str
+
+    Returns
+    -------
+
+    """
+    return _substitute(r'(?<!^)(?=[A-Z])', '_', value).lower()
+
+
 class _BuildArguments(dict[str, Any]):
     """ """
 
@@ -112,6 +127,40 @@ class _BuildArguments(dict[str, Any]):
 
 class _Builder(ABC, Generic[TModel]):  # pylint: disable=R0903
     """ """
+
+    def __init__(self, existing_items: dict[str, Any] | None = None) -> None:
+        """
+
+        Parameters
+        ----------
+            existing_items : dict[str, Any], optional
+
+        Returns
+        -------
+
+        """
+        self._args: _BuildArguments = _BuildArguments(existing_items or {})
+
+    @classmethod
+    def from_instance(cls, instance: TModel) -> Self:
+        """
+        Creates a new instance of the builder class initializing it with data
+        taken from an existing instance.
+
+        Parameters
+        ----------
+        instance: TModel
+            The existing instance.
+
+        Returns
+        -------
+            The new instance
+
+        """
+        data: dict[str, Any] = asdict(instance)
+        builder = cls(data)
+
+        return builder
 
     @abstractmethod
     def build(self) -> TModel:
@@ -143,7 +192,13 @@ def _make_non_optional_type(t: type) -> type:
     -------
 
     """
-    if get_origin(t) is Union and type(None) in get_args(t):
+
+    if get_origin(t) in (Union, UnionType) and type(None) in get_args(t):
+        types: tuple[type, ...] = get_args(t)
+        if len(types) == 2:
+            if types[0] is type(None):
+                return types[1]
+            return types[0]
         return cast(type, tuple(a for a in get_args(t) if a is not type(None)))
 
     return t
@@ -165,38 +220,41 @@ def _determine_fluent_function(
     """
 
     def with_scalar(self, field_name: str, value: Any):
-        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        my_args: _BuildArguments = self._args  # pylint: disable=W0212
         my_args[field_name] = value
         return self
 
     def with_builder(self, field_name: str, builder: _Builder):
-        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        my_args: _BuildArguments = self._args  # pylint: disable=W0212
         my_args[field_name] = builder.build()
         return self
 
     def with_sequence(self, field_name: str, *values: Any):
-        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        my_args: _BuildArguments = self._args  # pylint: disable=W0212
         seq: Sequence = list(values)
         my_args[field_name] = seq
         return self
 
     def with_mapping(self, field_name: str, **values: Any):
-        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        my_args: _BuildArguments = self._args  # pylint: disable=W0212
         mapping: Mapping[str, Any] = values
         my_args[field_name] = mapping
         return self
 
     def with_builder_sequence(self, field_name: str, *builders: _Builder):
-        my_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        my_args: _BuildArguments = self._args  # pylint: disable=W0212
         seq: Sequence = [b.build() for b in builders]
         my_args[field_name] = seq
         return self
 
-    field_type = field.type
+    field_type: type = field.type
     field_type = _make_non_optional_type(field_type)
 
     if is_dataclass(field_type):
-        arg_type = _make_builder(field.type, additional_builders)
+        arg_type = _make_builder(
+            field_type,  # type: ignore
+            additional_builders,
+        )
         arg_name = "builder"
         return cast(_FluentFunctionType, with_builder), arg_name, arg_type
     if get_origin(field_type) is collections.abc.Mapping or (
@@ -213,7 +271,10 @@ def _determine_fluent_function(
         if len(args) == 1:
             field_type = args[0]
             if is_dataclass(field_type):
-                arg_type = _make_builder(field_type, additional_builders)
+                arg_type = _make_builder(
+                    field_type,  # type: ignore
+                    additional_builders,
+                )
                 arg_name = "*builders"
                 return (
                     cast(_FluentFunctionType, with_builder_sequence),
@@ -260,24 +321,19 @@ def _make_builder(
 
     update_ns: dict = {}
 
-    def __init__(self) -> None:  # noqa: N807
-        self.__args: _BuildArguments = _BuildArguments()  # type: ignore
-
     def build(self) -> TModel:
-        my_builder_args: _BuildArguments = self.__args  # pylint: disable=W0212
+        my_builder_args: _BuildArguments = self._args  # pylint: disable=W0212
         return cast(TModel, entity_type(**my_builder_args.get_build_items()))
 
     for field in fields(entity_type):
         function_name, target_func = _generate_field_setter_function(
+            entity_name,
             field,
             additional_builders,
         )
 
         update_ns[function_name] = target_func
 
-    update_ns[__init__.__name__] = create_function(
-        "__init__(self) -> None", __init__
-    )
     update_ns[build.__name__] = create_function(
         f"build(self) -> {entity_type.__qualname__}", build
     )
@@ -287,67 +343,200 @@ def _make_builder(
     )
     concrete_class = cast(type[_Builder[TModel]], builder_class)
     additional_builders[entity_name] = cast(type[_Builder], concrete_class)
+    concrete_class.__doc__ = _gen_class_doc(builder_name, entity_name)
     return concrete_class
 
 
+def _gen_class_doc(builder_name: str, entity_name: str) -> str:
+    """
+
+    Parameters
+    ----------
+    builder_name: str
+    entity_name: str
+
+    Returns
+    -------
+    str
+
+    """
+    return f"""
+        The {builder_name} represents an implementation of the builder pattern
+        for the {entity_name} dataclass.
+    """
+
+
+def _gen_method_doc(
+    class_name: str, field: Field, arg_name: str, arg_type: type
+) -> str:
+    """
+
+    Parameters
+    ----------
+    class_name: str
+    field: Field
+    arg_name: str
+    arg_type: type
+
+    Returns
+    -------
+    str
+
+    """
+
+    arg_type_name: str = (
+        arg_type.__name__ if isclass(arg_type) else str(arg_type)
+    )
+    if arg_name.startswith("*"):
+        arg_type_name = f"collections.abc.Sequence[{arg_type_name}]"
+        if arg_name.startswith("**"):
+            arg_type_name = f"collections.abc.Mapping[str, {arg_type_name}]"
+        arg_name = arg_name.lstrip("*")
+
+    doc_str = f"""
+        Sets the value of the '{field.name}' attribute of the resulting
+        {class_name} instance to the specified argument
+        and returns the modified instance of the builder itself.
+
+        In case the argument is an instance of the Builder base class or a
+        sequence of this, the builder will be invoked to create a new instance
+        of the new class before setting the attribute.
+
+        Parameters
+        ----------
+            {arg_name}: {arg_type_name}
+                The value of the property / attribute to set or
+                the builder to create these values.
+
+        Returns
+        -------
+            The modified instance of this builder.
+    """
+    return doc_str
+
+
 def _generate_field_setter_function(
-    field: Field, additional_builders: _BuilderCollection
+    class_name: str, field: Field, additional_builders: _BuilderCollection
 ) -> tuple[str, _FluentFunctionType]:
     """
 
     Parameters
     ----------
-    field
-    additional_builders
+    class_name: str
+    field: Field
+    additional_builders: _BuilderCollection
 
     Returns
     -------
 
     """
-    function_name: str = f"with_{field.name}"
+    lower_snake_case_name: str = _to_lower_snake_case(field.name)
+    function_name: str = f"with_{lower_snake_case_name}"
     target_func, arg_name, arg_type = _determine_fluent_function(
         field, additional_builders
     )
     arg_type_name = (
-        arg_type.__qualname__ if isclass(arg_type) else str(arg_type)
+        arg_type.__name__ if isclass(arg_type) else str(arg_type)
     )
     arg: str = f"{arg_name}: {arg_type_name}"
     if field.name == "requestedBy":
         arg = f"{arg_name}: tuple[str]"
     signature: str = f"{function_name}(self, {arg}) -> Self"
     target_func = partial(target_func, field_name=field.name)
-    target_func = create_function(signature, target_func)
+    doc = _gen_method_doc(class_name, field, arg_name, arg_type)
+    target_func = create_function(signature, target_func, doc=doc)
     return function_name, target_func
 
 
-BuildAgentBuilder: TypeAlias = _make_builder(  # type: ignore
+_BuildAgentBuilder: TypeAlias = _make_builder(  # type: ignore
     BuildAgent, __all_builders
 )
-AgentBuilder: TypeAlias = _make_builder(Agent, __all_builders)  # type: ignore
-ArtifactBuilder: TypeAlias = _make_builder(  # type: ignore
+
+
+class BuildAgentBuilder(_BuildAgentBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_AgentBuilder: TypeAlias = _make_builder(Agent, __all_builders)  # type: ignore
+
+
+class AgentBuilder(_AgentBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_ArtifactBuilder: TypeAlias = _make_builder(  # type: ignore
     Artifact, __all_builders
 )
-DependencyBuilder: TypeAlias = _make_builder(  # type: ignore
+
+
+class ArtifactBuilder(_ArtifactBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_DependencyBuilder: TypeAlias = _make_builder(  # type: ignore
     Dependency, __all_builders
 )
-ModuleBuilder: TypeAlias = _make_builder(  # type: ignore
+
+
+class DependencyBuilder(_DependencyBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_ModuleBuilder: TypeAlias = _make_builder(  # type: ignore
     Module, __all_builders
 )
-TrackerBuilder: TypeAlias = _make_builder(  # type: ignore
+
+
+class ModuleBuilder(_ModuleBuilder):  # pylint: disable=R0903
+    """ """
+    pass
+
+
+_TrackerBuilder: TypeAlias = _make_builder(  # type: ignore
     Tracker, __all_builders
 )
-AffectedIssueBuilder: TypeAlias = _make_builder(  # type: ignore
+
+
+class TrackerBuilder(_TrackerBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_AffectedIssueBuilder: TypeAlias = _make_builder(  # type: ignore
     AffectedIssue, __all_builders
 )
-IssuesBuilder: TypeAlias = _make_builder(  # type: ignore
+
+
+class AffectedIssueBuilder(_AffectedIssueBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_IssuesBuilder: TypeAlias = _make_builder(  # type: ignore
     Issues, __all_builders
 )
-VCSBuilder: TypeAlias = _make_builder(VCS, __all_builders)  # type: ignore
+
+
+class IssuesBuilder(_IssuesBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
+_VCSBuilder: TypeAlias = _make_builder(VCS, __all_builders)  # type: ignore
+
+
+class VCSBuilder(_VCSBuilder):  # pylint: disable=R0903
+    """ """
+    pass  # pylint: disable=W0107
+
+
 _BuildInfoBuilder: TypeAlias = _make_builder(  # type: ignore
     BuildInfo, __all_builders
 )
-
-del __all_builders
 
 
 class BuildInfoBuilder(_BuildInfoBuilder):
@@ -388,3 +577,6 @@ class BuildInfoBuilder(_BuildInfoBuilder):
         properties.update(environ)
         properties = {k: v for k, v in properties.items() if k not in keys}
         return self.with_properties(**properties)
+
+
+del __all_builders
