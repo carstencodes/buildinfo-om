@@ -19,6 +19,7 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+plugins = ["pdm-bump", "pdm-audit"]
 
 [tool.pdm.scripts]
 get-schema = "curl https://raw.githubusercontent.com/jfrog/build-info-go/6d8e36041ae4263c97d5984cdc7cebbdd7c04112/buildinfo-schema.json -o schema/build-info.schema.json"
