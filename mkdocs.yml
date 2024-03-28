@@ -24,3 +24,4 @@ plugins:
         options:
           extensions:
             - griffe_inherited_docstrings
+            - griffe_runtime

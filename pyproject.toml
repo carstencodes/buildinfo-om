@@ -24,7 +24,6 @@ distribution = true
 get-schema = "curl https://raw.githubusercontent.com/jfrog/build-info-go/6d8e36041ae4263c97d5984cdc7cebbdd7c04112/buildinfo-schema.json -o schema/build-info.schema.json"
 run_dmcg = "datamodel-codegen --input schema/build-info.schema.json --custom-file-header-path .licenseheader --output src/buildinfo_om/_model.py --output-model-type dataclasses.dataclass --enum-field-as-literal all --field-constraints --set-default-enum-member --strict-types str bytes int float bool --use-annotated --use-generic-container-types --use-non-positive-negative-number-constrained-types --use-double-quotes --use-standard-collections --use-subclass-enum --use-union-operator --capitalise-enum-members --use-default-kwarg --use-field-description --disable-appending-item-suffix --enable-version-header --target-python-version 3.11 --use-schema-description --use-title-as-name --no-color --input-file-type jsonschema"
 remove_future_annotations = "sed -i /'^from __future__ import annotations$'/d src/buildinfo_om/_model.py"
-docs = "mkdocs build -c -s -v"
 create-om = { composite = [ "run_dmcg", "remove_future_annotations" ] }
 flake = "flake518 src/"
 mypy = "mypy src/"
@@ -40,6 +39,10 @@ vulture = "vulture src/"
 bandit = "bandit src/"
 prospector = "prospector src/"
 copyright-headers = "licenseheaders -y 2024 -o 'Carsten Igel' -n pdm-bump -d . -u https://github.com/carstencodes/pdm-bump -x src/pdm_bump/dynamic.py -t ./.licenseheader.j2 -E .py"
+
+[tool.pdm.scripts.docs]
+cmd = "mkdocs build -c -s -v"
+env = { PYTHONPATH = "./util/griffe" }
 
 [tool.pdm.scripts.check-style]
 composite = [
