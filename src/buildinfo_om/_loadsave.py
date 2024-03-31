@@ -48,7 +48,7 @@
 from dataclasses import asdict
 from json import dumps, loads
 from os import PathLike
-from typing import Any, Mapping, TextIO, cast
+from typing import Any, Mapping, TextIO, cast, AnyStr, IO
 
 from dacite import Config, from_dict  # type: ignore
 
@@ -143,13 +143,30 @@ def save_to_file(bi: BuildInfo, path: PathLike) -> None:
         save_to_buffer(bi, buffer)
 
 
-def save_to_buffer(bi: BuildInfo, buffer: TextIO) -> None:
+def save_to_text_buffer(bi: BuildInfo, buffer: TextIO) -> None:
     """
 
     Parameters
     ----------
     bi: BuildInfo
     buffer: TextIO
+
+    Returns
+    -------
+    None
+
+    """
+    data: str = transform_to_str(bi)
+    buffer.write(data)
+
+
+def save_to_buffer(bi: BuildInfo, buffer: IO[AnyStr]) -> None:
+    """
+
+    Parameters
+    ----------
+    bi: BuildInfo
+    buffer: IO[AnyStr]
 
     Returns
     -------
