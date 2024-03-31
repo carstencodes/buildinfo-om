@@ -176,6 +176,16 @@ def transform_to_str(bi: BuildInfo) -> str:
     return dumps(data)
 
 
+def _remove_empty_values(data: Mapping[str, Any]) -> Mapping[str, Any]:
+    for key, value in data.items():
+        if value is None:
+            del data[key]
+        elif isinstance(value, dict):
+            _ = _remove_empty_values(value)
+
+    return data
+
+
 def transform_to_mapping(bi: BuildInfo) -> Mapping[str, Any]:
     """
 
@@ -189,4 +199,5 @@ def transform_to_mapping(bi: BuildInfo) -> Mapping[str, Any]:
 
     """
     data: Mapping[str, Any] = asdict(bi)
+    _remove_empty_values(data)
     return data
