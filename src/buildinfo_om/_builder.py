@@ -219,17 +219,17 @@ def _determine_fluent_function(
 
     """
 
-    def with_scalar(self, field_name: str, value: Any):
+    def with_scalar(self, value: Any, *, field_name: str):
         my_args: _BuildArguments = self._args  # pylint: disable=W0212
         my_args[field_name] = value
         return self
 
-    def with_builder(self, field_name: str, builder: _Builder):
+    def with_builder(self, builder: _Builder, *, field_name: str):
         my_args: _BuildArguments = self._args  # pylint: disable=W0212
         my_args[field_name] = builder.build()
         return self
 
-    def with_sequence(self, field_name: str, *values: Any):
+    def with_sequence(self, *values: Any, field_name: str):
         my_args: _BuildArguments = self._args  # pylint: disable=W0212
         seq: Sequence = list(values)
         my_args[field_name] = seq
@@ -241,7 +241,7 @@ def _determine_fluent_function(
         my_args[field_name] = mapping
         return self
 
-    def with_builder_sequence(self, field_name: str, *builders: _Builder):
+    def with_builder_sequence(self, *builders: _Builder, field_name: str):
         my_args: _BuildArguments = self._args  # pylint: disable=W0212
         seq: Sequence = [b.build() for b in builders]
         my_args[field_name] = seq
