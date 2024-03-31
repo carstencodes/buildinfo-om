@@ -473,7 +473,44 @@ _ArtifactBuilder: TypeAlias = _make_builder(  # type: ignore
 
 class ArtifactBuilder(_ArtifactBuilder):  # pylint: disable=R0903
     """ """
-    pass  # pylint: disable=W0107
+    def with_hash_composite_value(self, hash_value: str) -> Self:
+        """
+
+        Parameters
+        ----------
+        hash_value: str
+
+        Returns
+        -------
+        Self
+
+        """
+        composite_parts: list[str] = hash_value.split(":", 2)
+        return self.with_hash_value(composite_parts[0], composite_parts[1])
+
+    def with_hash_value(self, algorithm: str, hash_value: str) -> Self:
+        """
+
+        Parameters
+        ----------
+        algorithm: str
+        hash_value: str
+
+        Returns
+        -------
+        Self
+
+        """
+
+        if algorithm not in ("md5", "sha1", "sha256"):
+            return Self
+
+        if algorithm == "sha256":
+            return self.with_sha256(hash_value)
+        elif algorithm == "sha1":
+            return self.with_sha1(hash_value)
+        else:
+            return self.with_md5(hash_value)
 
 
 _DependencyBuilder: TypeAlias = _make_builder(  # type: ignore
