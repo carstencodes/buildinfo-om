@@ -43,8 +43,7 @@
 
 """
 """
-
-
+from collections.abc import Sequence
 from dataclasses import asdict
 from json import dumps, loads
 from os import PathLike
@@ -199,6 +198,10 @@ def _remove_empty_values(data: Mapping[str, Any]) -> Mapping[str, Any]:
             del data[key]
         elif isinstance(value, dict):
             _ = _remove_empty_values(value)
+        elif isinstance(value, Sequence):
+            for inner_value in list(value):
+                if isinstance(inner_value, dict):
+                    _ = _remove_empty_values(inner_value)
 
     return data
 
