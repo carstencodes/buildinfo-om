@@ -194,7 +194,7 @@ def transform_to_str(bi: BuildInfo) -> str:
 
 
 def _remove_empty_values(data: Mapping[str, Any]) -> Mapping[str, Any]:
-    for key, value in data.items():
+    for key, value in list(data.items()):
         if value is None:
             del data[key]
         elif isinstance(value, dict):
