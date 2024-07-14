@@ -1,6 +1,6 @@
 [project]
 name = "buildinfo-om"
-version = "0.7.0"
+version = "0.8.0"
 description = "JFrog BuildInfo ObjectModel written in python"
 authors = [
     { name = "Carsten Igel", email = "cig@bite-that-bit.de" },
