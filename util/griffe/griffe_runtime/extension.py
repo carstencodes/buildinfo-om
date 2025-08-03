@@ -4,16 +4,19 @@ import collections.abc
 import inspect
 from typing import Optional, Self, Union
 
-from griffe import Extension, Class, Function, Docstring, Object, ObjectNode
-
 from importlib import import_module
 
-from griffe.dataclasses import Parameters, Parameter
-from griffe.enumerations import ParameterKind
+from griffe import Extension, Class, Function, Docstring, Object, ObjectNode, Parameters, Parameter, ParameterKind, Visitor, Inspector, DocstringSectionParameters
 
 
 def _make_member(name: str, m: collections.abc.Callable, parent: Class) -> Object:
-    docstring = Docstring(m.__doc__ or "")
+    p = None
+    opts = None
+    if parent.docstring is not None:
+        p = parent.docstring.parser
+        opts = parent.docstring.parser_options
+
+    docstring = Docstring(m.__doc__ or "", parser=p, parser_options=opts)
     sig: inspect.Signature = inspect.signature(m)
 
     return_type: Optional[str] = None
@@ -22,7 +25,9 @@ def _make_member(name: str, m: collections.abc.Callable, parent: Class) -> Objec
         if sig.return_annotation == Self:
             return_type = parent.name
 
+
     args = Parameters()
+
     for arg_name, signature in inspect.signature(m).parameters.items():
         kind: ParameterKind = ParameterKind.positional_or_keyword
         if signature.kind == inspect.Parameter.POSITIONAL_ONLY:
@@ -45,7 +50,8 @@ def _make_member(name: str, m: collections.abc.Callable, parent: Class) -> Objec
         args.add(Parameter(arg_name,
                            annotation=annotation,
                            default=default,
-                           kind=kind))
+                           kind=kind,
+                           docstring=docstring))
 
     f: Function = Function(
         name=name,
@@ -74,9 +80,14 @@ def _make_new_member(cls: Class, member: Function) -> Function:
     return f
 
 
-def _make_class(t: type) -> Class:
+def _make_class(t: type, d: Docstring | None) -> Class:
+    p = None
+    opts = None
+    if d is not None:
+        p = d.parser
+        opts = d.parser_options
     c: Class = Class(name=t.__name__)
-    c.docstring = Docstring(c.__doc__)
+    c.docstring = Docstring(c.__doc__ or "", parser=p, parser_options=opts)
 
     for member_name in (m for m in dir(t) if not m.startswith("_")):
         member = getattr(t, member_name)
@@ -92,7 +103,7 @@ def _make_class(t: type) -> Class:
 
 class RuntimeDocstringsExtension(Extension):
     def __init__(self):
-        self.__items: dict[str, Class] = {}
+        self.__items: dict[str, type] = {}
         module = import_module("buildinfo_om")
         self.__fill_items(module)
 
@@ -101,7 +112,8 @@ class RuntimeDocstringsExtension(Extension):
             return
 
         if cls.name in self.__items.keys():
-            existing = self.__items[cls.name]
+            member = self.__items[cls.name]
+            existing = _make_class(member, cls.docstring)
             cls.docstring = existing.docstring
             for key, member in existing.members.items():
                 if not isinstance(member, Function):
@@ -116,4 +128,4 @@ class RuntimeDocstringsExtension(Extension):
             if not runtime_member.__name__.endswith('Builder'):
                 continue
 
-            self.__items[runtime_member.__name__] = _make_class(runtime_member)
+            self.__items[runtime_member.__name__] = runtime_member
