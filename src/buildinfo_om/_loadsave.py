@@ -57,13 +57,11 @@ from ._vcs import BuildInfo
 def load_from_file(path: PathLike) -> BuildInfo:
     """
 
-    Parameters
-    ----------
-    path: PathLike
+    Args:
+        path (PathLike):
 
-    Returns
-    -------
-    BuildInfo
+    Returns:
+        BuildInfo:
 
     """
     with open(path, "r", encoding="utf-8") as buffer:
@@ -73,13 +71,11 @@ def load_from_file(path: PathLike) -> BuildInfo:
 def load_from_buffer(buf: TextIO) -> BuildInfo:
     """
 
-    Parameters
-    ----------
-    buf: TextIO
+    Args:
+        buf (TextIO):
 
-    Returns
-    -------
-    BuildInfo
+    Returns:
+        BuildInfo:
 
     """
     data: str | bytes = buf.read()
@@ -89,13 +85,11 @@ def load_from_buffer(buf: TextIO) -> BuildInfo:
 def load_from_str(value: str | bytes | bytearray) -> BuildInfo:
     """
 
-    Parameters
-    ----------
-    value: str | bytes | bytearray
+    Args:
+        value (str | bytes | bytearray):
 
-    Returns
-    -------
-    BuildInfo
+    Returns:
+        BuildInfo:
 
     """
     data: Any = loads(value)
@@ -108,13 +102,11 @@ def load_from_str(value: str | bytes | bytearray) -> BuildInfo:
 def load_from_dict(data: Mapping[str, Any]) -> BuildInfo:
     """
 
-    Parameters
-    ----------
-    data: Mapping[str, Any]
+    Args:
+        data (Mapping[str, Any]):
 
-    Returns
-    -------
-    BuildInfo
+    Returns:
+        BuildInfo:
 
     """
     cfg: Config = Config()
@@ -128,14 +120,12 @@ def load_from_dict(data: Mapping[str, Any]) -> BuildInfo:
 def save_to_file(bi: BuildInfo, path: PathLike) -> None:
     """
 
-    Parameters
-    ----------
-    bi: BuildInfo
-    path: PathLike
+    Args:
+        bi (BuildInfo):
+        path (PathLike):
 
-    Returns
-    -------
-    None
+    Returns:
+        None:
 
     """
     with open(path, "w+", encoding="utf-8") as buffer:
@@ -145,14 +135,12 @@ def save_to_file(bi: BuildInfo, path: PathLike) -> None:
 def save_to_text_buffer(bi: BuildInfo, buffer: TextIO) -> None:
     """
 
-    Parameters
-    ----------
-    bi: BuildInfo
-    buffer: TextIO
+    Args:
+        bi (BuildInfo):
+        buffer (TextIO):
 
-    Returns
-    -------
-    None
+    Returns:
+        None:
 
     """
     data: str = transform_to_str(bi)
@@ -162,14 +150,12 @@ def save_to_text_buffer(bi: BuildInfo, buffer: TextIO) -> None:
 def save_to_buffer(bi: BuildInfo, buffer: IO[AnyStr]) -> None:
     """
 
-    Parameters
-    ----------
-    bi: BuildInfo
-    buffer: IO[AnyStr]
+    Args:
+        bi (BuildInfo):
+        buffer (IO[AnyStr]):
 
-    Returns
-    -------
-    None
+    Returns:
+        None
 
     """
     data: str = transform_to_str(bi)
@@ -179,13 +165,11 @@ def save_to_buffer(bi: BuildInfo, buffer: IO[AnyStr]) -> None:
 def transform_to_str(bi: BuildInfo) -> str:
     """
 
-    Parameters
-    ----------
-    bi: BuildInfo
+    Args:
+        bi (BuildInfo):
 
-    Returns
-    -------
-    str
+    Returns:
+        str:
 
     """
     data: Mapping[str, Any] = transform_to_mapping(bi)
@@ -209,13 +193,11 @@ def _remove_empty_values(data: Mapping[str, Any]) -> Mapping[str, Any]:
 def transform_to_mapping(bi: BuildInfo) -> Mapping[str, Any]:
     """
 
-    Parameters
-    ----------
-    bi: BuildInfo
+    Args:
+        bi (BuildInfo):
 
-    Returns
-    -------
-    Mapping[str, Any]
+    Returns:
+        Mapping[str, Any]:
 
     """
     data: Mapping[str, Any] = asdict(bi)

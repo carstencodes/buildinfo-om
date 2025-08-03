@@ -99,12 +99,11 @@ TModel = TypeVar(  # pylint: disable=C0103
 def _to_lower_snake_case(value: str) -> str:
     """
 
-    Parameters
-    ----------
-    value: str
+    Args:
+        value (str):
 
-    Returns
-    -------
+    Returns:
+        str:
 
     """
     return _substitute(r'(?<!^)(?=[A-Z])', '_', value).lower()
@@ -116,8 +115,8 @@ class _BuildArguments(dict[str, Any]):
     def get_build_items(self) -> Mapping[str, Any]:
         """
 
-        Returns
-        -------
+        Returns:
+            Mapping[str, Any]:
 
         """
         ro_copy: dict[str, Any] = {}
@@ -131,12 +130,11 @@ class _Builder(ABC, Generic[TModel]):  # pylint: disable=R0903
     def __init__(self, existing_items: dict[str, Any] | None = None) -> None:
         """
 
-        Parameters
-        ----------
-            existing_items : dict[str, Any], optional
+        Args:
+            existing_items (dict[str, Any], optional):
 
-        Returns
-        -------
+        Returns:
+            None:
 
         """
         self._args: _BuildArguments = _BuildArguments(existing_items or {})
@@ -147,14 +145,11 @@ class _Builder(ABC, Generic[TModel]):  # pylint: disable=R0903
         Creates a new instance of the builder class initializing it with data
         taken from an existing instance.
 
-        Parameters
-        ----------
-        instance: TModel
-            The existing instance.
+        Args:
+            instance (TModel): The existing instance.
 
-        Returns
-        -------
-            The new instance
+        Returns:
+            Self: The new instance
 
         """
         data: dict[str, Any] = asdict(instance)
@@ -166,8 +161,8 @@ class _Builder(ABC, Generic[TModel]):  # pylint: disable=R0903
     def build(self) -> TModel:
         """
 
-        Returns
-        -------
+        Returns:
+            TModel:
 
         """
         raise NotImplementedError()
@@ -184,12 +179,11 @@ _FluentFunctionType = Callable[[Any, str, _FluentFunctArgsType], Any]
 def _make_non_optional_type(t: type) -> type:
     """
 
-    Parameters
-    ----------
-    t
+    Args:
+        t (type):
 
-    Returns
-    -------
+    Returns:
+        type:
 
     """
 
@@ -209,14 +203,12 @@ def _determine_fluent_function(
 ) -> tuple[_FluentFunctionType, str, type]:
     """
 
-    Parameters
-    ----------
-    field
-    additional_builders
+    Args:
+        field (Field):
+        additional_builders (_BuilderCollection):
 
-    Returns
-    -------
-
+    Returns:
+        tuple[_FluentFunctionType, str, type]:
     """
 
     def with_scalar(self, value: Any, *, field_name: str):
@@ -302,13 +294,12 @@ def _make_builder(
 ) -> type[_Builder[TModel]]:
     """
 
-    Parameters
-    ----------
-    entity_type
-    additional_builders
+    Args:
+        entity_type (type[TBuilder]):
+        additional_builders (_BuilderCollection):
 
-    Returns
-    -------
+    Returns:
+        type[_Builder[TModel]]:
 
     """
     if not is_dataclass(entity_type):
@@ -350,14 +341,12 @@ def _make_builder(
 def _gen_class_doc(builder_name: str, entity_name: str) -> str:
     """
 
-    Parameters
-    ----------
-    builder_name: str
-    entity_name: str
+    Args:
+        builder_name (str):
+        entity_name (str):
 
-    Returns
-    -------
-    str
+    Returns:
+        str:
 
     """
     return f"""
@@ -371,16 +360,14 @@ def _gen_method_doc(
 ) -> str:
     """
 
-    Parameters
-    ----------
-    class_name: str
-    field: Field
-    arg_name: str
-    arg_type: type
+    Args:
+        class_name (str):
+        field (Field):
+        arg_name (str):
+        arg_type (type):
 
-    Returns
-    -------
-    str
+    Returns:
+        str:
 
     """
 
@@ -402,15 +389,11 @@ def _gen_method_doc(
         sequence of this, the builder will be invoked to create a new instance
         of the new class before setting the attribute.
 
-        Parameters
-        ----------
-            {arg_name}: {arg_type_name}
-                The value of the property / attribute to set or
-                the builder to create these values.
+        Args:
+            {arg_name} ({arg_type_name}): The value of the property / attribute to set or the builder to create these values.
 
-        Returns
-        -------
-            The modified instance of this builder.
+        Returns:
+            Self: The modified instance of this builder.
     """
     return doc_str
 
@@ -420,14 +403,13 @@ def _generate_field_setter_function(
 ) -> tuple[str, _FluentFunctionType]:
     """
 
-    Parameters
-    ----------
-    class_name: str
-    field: Field
-    additional_builders: _BuilderCollection
+    Args:
+        class_name (str):
+        field (Field):
+        additional_builders (_BuilderCollection):
 
-    Returns
-    -------
+    Returns:
+        tuple[str, _FluentFunctionType]:
 
     """
     lower_snake_case_name: str = _to_lower_snake_case(field.name)
@@ -476,13 +458,11 @@ class ArtifactBuilder(_ArtifactBuilder):  # pylint: disable=R0903
     def with_hash_composite_value(self, hash_value: str) -> Self:
         """
 
-        Parameters
-        ----------
-        hash_value: str
+        Args:
+            hash_value (str):
 
-        Returns
-        -------
-        Self
+        Returns:
+            Self
 
         """
         composite_parts: list[str] = hash_value.split(":", 2)
@@ -491,19 +471,17 @@ class ArtifactBuilder(_ArtifactBuilder):  # pylint: disable=R0903
     def with_hash_value(self, algorithm: str, hash_value: str) -> Self:
         """
 
-        Parameters
-        ----------
-        algorithm: str
-        hash_value: str
+        Args:
+            algorithm (str):
+            hash_value (str):
 
-        Returns
-        -------
-        Self
+        Returns:
+            Self:
 
         """
 
         if algorithm not in ("md5", "sha1", "sha256"):
-            return Self
+            return self
 
         if algorithm == "sha256":
             return self.with_sha256(hash_value)
@@ -520,18 +498,15 @@ _DependencyBuilder: TypeAlias = _make_builder(  # type: ignore
 
 class DependencyBuilder(_DependencyBuilder):  # pylint: disable=R0903
     """ """
-    """ """
 
     def with_hash_composite_value(self, hash_value: str) -> Self:
         """
 
-        Parameters
-        ----------
-        hash_value: str
+        Args:
+            hash_value (str):
 
-        Returns
-        -------
-        Self
+        Returns:
+            Self:
 
         """
         composite_parts: list[str] = hash_value.split(":", 2)
@@ -540,19 +515,17 @@ class DependencyBuilder(_DependencyBuilder):  # pylint: disable=R0903
     def with_hash_value(self, algorithm: str, hash_value: str) -> Self:
         """
 
-        Parameters
-        ----------
-        algorithm: str
-        hash_value: str
+        Args:
+            algorithm (str):
+            hash_value (str):
 
-        Returns
-        -------
-        Self
+        Returns:
+            Self:
 
         """
 
         if algorithm not in ("md5", "sha1", "sha256"):
-            return Self
+            return self
 
         if algorithm == "sha256":
             return self.with_sha256(hash_value)
@@ -621,13 +594,11 @@ class BuildInfoBuilder(_BuildInfoBuilder):
     def collect_env(self, **additional_properties: Any) -> Self:
         """
 
-        Parameters
-        ----------
-        additional_properties: Mapping[str, Any]
+        Args:
+            additional_properties (Mapping[str, Any]):
 
-        Returns
-        -------
-        Self
+        Returns:
+            Self:
 
         """
         properties: dict[str, str] = additional_properties
@@ -639,14 +610,12 @@ class BuildInfoBuilder(_BuildInfoBuilder):
     ) -> Self:
         """
 
-        Parameters
-        ----------
-        keys: tuple[str, ...]
-        additional_properties: Mapping[str, Any]
+        Args:
+            keys (tuple[str, ...]):
+            additional_properties (Mapping[str, Any]):
 
-        Returns
-        -------
-        Self
+        Returns:
+            Self:
 
         """
         properties: dict[str, str] = additional_properties
