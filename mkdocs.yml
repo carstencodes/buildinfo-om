@@ -1,17 +1,36 @@
 site_name: Build-Info Object Model
+
+repo_url: https://github.com/carstencodes/buildinfo-om
+edit_uri: edit/main/docs
+
 nav:
   - Home: 'index.md'
   - 'BuildInfo ObjectModel':
        - DataModel: 'buildinfo-om.md'
 theme:
-  name: readthedocs
+  name: material
   nav_style: dark
+  color_mode: auto
+  user_color_mode_toggle: true
   highlightjs: true
   hljs_languages:
     - yaml
     - rust
+    - python
+markdown_extensions:
+  - tables
+  - admonition
+
 plugins:
 - autorefs:
+- mike:
+    alias_type: redirect
+    redirect_template: null
+    deploy_prefix: 'libraries/python/buildinfo-om'
+    canonical_version: null
+    version_selector: true
+    css_dir: css
+    javascript_dir: js
 - mkdocstrings:
     enabled: true
     enable_inventory: true
