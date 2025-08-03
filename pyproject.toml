@@ -6,8 +6,8 @@ authors = [
     { name = "Carsten Igel", email = "cig@bite-that-bit.de" },
 ]
 dependencies = [
-    "dacite>=1.8.1",
-    "makefun>=1.15.2",
+    "dacite~=1.9",
+    "makefun~=1.16",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -59,6 +59,9 @@ cmd = "mkdocs build -c -s -v"
 [tool.pdm.scripts.docs.env]
 PYTHONPATH = "./util/griffe"
 
+[tool.pdm.scripts.servedocs]
+cmd = "python -m http.server 8080 -d ./site"
+
 [tool.pdm.scripts.check-style]
 composite = [
     "flake",
@@ -91,47 +94,6 @@ composite = [
 
 [tool.pdm.scripts.check-commits]
 shell = "gitlint --commits $(git describe --tags --abbrev=0)..HEAD lint"
-
-[tool.pdm.dev-dependencies]
-build = [
-    "datamodel-code-generator[http]>=0.25.3",
-]
-docs = [
-    "mkdocs>=1.5.3",
-    "mkdocstrings[python]>=0.24.0",
-    "griffe-inherited-docstrings>=1.0.0",
-]
-test = [
-    "pytest>=7.1.2",
-    "tox>=3.25.1",
-    "tox-pdm>=0.6.0",
-    "pytest-cov>=3.0.0",
-]
-formatting = [
-    "black>=22.6.0",
-    "isort>=5.10.1",
-    "licenseheaders>=0.8.8",
-    "autoflake>=2.0.2",
-    "pyment>=0.3.3",
-]
-release = [
-    "gitlint>=0.17.0",
-    "pip-audit>=2.4.4",
-]
-static-code-analysis = [
-    "radon>=5.1.0",
-    "vulture>=2.7",
-    "bandit>=1.7.4",
-    "prospector>=0.12.2",
-]
-checkstyle = [
-    "flake8>=3.9.2",
-    "flake518>=1.2.3",
-    "mypy>=1.8.0",
-    "pylint>=2.14.5",
-    "pycodestyle>=2.7.0",
-    "pep8-naming>=0.13.3",
-]
 
 [tool.black]
 line-length = 79
@@ -218,3 +180,46 @@ sort_commits = "oldest"
 [[tool.git-cliff.git.commit_preprocessors]]
 pattern = "\\((\\w+\\s)?#([0-9]+)\\)"
 replace = "([#${2}](https://github.com/orhun/git-cliff/issues/${2}))"
+
+[dependency-groups]
+build = [
+    "datamodel-code-generator[http]~=0.32",
+]
+checkstyle = [
+    "flake8~=7.3",
+    "flake518~=1.6",
+    "mypy~=1.17",
+    "pylint~=3.3",
+    "pycodestyle~=2.14",
+    "pep8-naming~=0.10",
+]
+docs = [
+    "mkdocs~=1.6",
+    "mkdocstrings[python]~=0.30",
+    "griffe-inherited-docstrings~=1.1",
+    "mkdocs-material>=9.6.16",
+    "mike>=2.1.3",
+]
+formatting = [
+    "black~=25.1",
+    "isort~=6.0",
+    "licenseheaders~=0.8",
+    "autoflake~=2.3",
+    "pyment~=0.3",
+]
+release = [
+    "gitlint~=0.19",
+    "pip-audit~=2.9",
+]
+static-code-analysis = [
+    "radon~=6.0",
+    "vulture~=2.14",
+    "bandit~=1.8",
+    "prospector~=1.17",
+]
+test = [
+    "pytest~=8.4",
+    "tox~=4.28",
+    "tox-pdm~=0.7",
+    "pytest-cov~=6.2",
+]
