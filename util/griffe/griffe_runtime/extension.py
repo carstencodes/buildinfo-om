@@ -96,7 +96,7 @@ class RuntimeDocstringsExtension(Extension):
         module = import_module("buildinfo_om")
         self.__fill_items(module)
 
-    def on_class_members(self, *, node: Union[ast.AST, ObjectNode], cls: Class) -> None:
+    def on_class_members(self, *, node: Union[ast.AST, ObjectNode], cls: Class, agent: Visitor | Inspector, **kwargs) -> None:
         if cls.name.startswith("_"):
             return
 
