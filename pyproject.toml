@@ -221,5 +221,5 @@ test = [
     "pytest~=8.4",
     "tox~=4.28",
     "tox-pdm~=0.7",
-    "pytest-cov~=6.2",
+    "pytest-cov~=7.0",
 ]
