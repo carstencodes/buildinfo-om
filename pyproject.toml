@@ -198,7 +198,7 @@ docs = [
 ]
 formatting = [
     "black~=25.1",
-    "isort~=6.0",
+    "isort~=7.0",
     "licenseheaders~=0.8",
     "autoflake~=2.3",
     "pyment~=0.3",
