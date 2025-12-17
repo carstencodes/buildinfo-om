@@ -43,7 +43,6 @@ radon_mi = "radon mi --show --json --output-file radon.mi.json src/"
 radon_hal = "radon hal --functions --json --output-file radon.hal.json src/"
 vulture = "vulture src/"
 bandit = "bandit src/"
-prospector = "prospector src/"
 copyright-headers = "licenseheaders -y 2024 -o 'Carsten Igel' -n pdm-bump -d . -u https://github.com/carstencodes/pdm-bump -x src/pdm_bump/dynamic.py -t ./.licenseheader.j2 -E .py"
 
 [tool.pdm.scripts.create-om]
@@ -87,7 +86,6 @@ composite = [
     "radon",
     "vulture",
     "bandit",
-    "prospector",
 ]
 
 [tool.pdm.scripts.check-commits]
@@ -187,7 +185,7 @@ checkstyle = [
     "flake8~=7.3",
     "flake518~=1.6",
     "mypy~=1.17",
-    "pylint~=3.3",
+    "pylint~=4.0",
     "pycodestyle~=2.14",
     "pep8-naming~=0.10",
 ]
@@ -213,7 +211,6 @@ static-code-analysis = [
     "radon~=6.0",
     "vulture~=2.14",
     "bandit~=1.8",
-    "prospector~=1.17",
 ]
 test = [
     "pytest~=8.4",
