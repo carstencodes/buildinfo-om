@@ -5,7 +5,7 @@
 groups = ["default", "build", "checkstyle", "docs", "formatting", "release", "static-code-analysis", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:825d55d049fa7d3e494457d58c493e341c1ba254833f8cca4b0c9089ef8998d6"
+content_hash = "sha256:eba0fc356270532eaa4d75881e23e994bcb6f7f9b8ef38b0deba138d1a192549"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -520,7 +520,7 @@ files = [
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.54.0"
+version = "0.55.0"
 requires_python = ">=3.10"
 summary = "Datamodel Code Generator"
 groups = ["build"]
@@ -529,32 +529,32 @@ dependencies = [
     "black>=19.10b0",
     "genson<2,>=1.2.1",
     "inflect<8,>=4.1",
-    "isort<8,>=4.3.21",
+    "isort<9,>=4.3.21",
     "jinja2<4,>=2.10.1",
-    "packaging",
-    "pydantic>=1.5",
+    "pydantic<3,>=2.12; python_version >= \"3.14\"",
+    "pydantic<3,>=2; python_version < \"3.14\"",
     "pyyaml>=6.0.1",
     "tomli<3,>=2.2.1; python_version <= \"3.11\"",
 ]
 files = [
-    {file = "datamodel_code_generator-0.54.0-py3-none-any.whl", hash = "sha256:3156df7a7e8fa5a7c9a6d50836e5ba5abe0532f6b71eee6d73a0c8e1fb5b7e47"},
-    {file = "datamodel_code_generator-0.54.0.tar.gz", hash = "sha256:2b183598d049e265146a8224c35d1bb96a80a641ea8ecd2a82e6a0e97b56da6b"},
+    {file = "datamodel_code_generator-0.55.0-py3-none-any.whl", hash = "sha256:efa5a925288ca2a135fdc3361c7d774ae5b24b4fd632868363e249d55ea2f137"},
+    {file = "datamodel_code_generator-0.55.0.tar.gz", hash = "sha256:20ae7a4fbbb12be380f0bd02544db4abae96c5b644d4b3f2b9c3fc0bc9ee1184"},
 ]
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.54.0"
+version = "0.55.0"
 extras = ["http"]
 requires_python = ">=3.10"
 summary = "Datamodel Code Generator"
 groups = ["build"]
 dependencies = [
-    "datamodel-code-generator==0.54.0",
+    "datamodel-code-generator==0.55.0",
     "httpx>=0.24.1",
 ]
 files = [
-    {file = "datamodel_code_generator-0.54.0-py3-none-any.whl", hash = "sha256:3156df7a7e8fa5a7c9a6d50836e5ba5abe0532f6b71eee6d73a0c8e1fb5b7e47"},
-    {file = "datamodel_code_generator-0.54.0.tar.gz", hash = "sha256:2b183598d049e265146a8224c35d1bb96a80a641ea8ecd2a82e6a0e97b56da6b"},
+    {file = "datamodel_code_generator-0.55.0-py3-none-any.whl", hash = "sha256:efa5a925288ca2a135fdc3361c7d774ae5b24b4fd632868363e249d55ea2f137"},
+    {file = "datamodel_code_generator-0.55.0.tar.gz", hash = "sha256:20ae7a4fbbb12be380f0bd02544db4abae96c5b644d4b3f2b9c3fc0bc9ee1184"},
 ]
 
 [[package]]
@@ -2218,7 +2218,7 @@ files = [
 
 [[package]]
 name = "typeguard"
-version = "4.4.4"
+version = "4.5.1"
 requires_python = ">=3.9"
 summary = "Run-time type checker for Python"
 groups = ["build"]
@@ -2227,8 +2227,8 @@ dependencies = [
     "typing-extensions>=4.14.0",
 ]
 files = [
-    {file = "typeguard-4.4.4-py3-none-any.whl", hash = "sha256:b5f562281b6bfa1f5492470464730ef001646128b180769880468bd84b68b09e"},
-    {file = "typeguard-4.4.4.tar.gz", hash = "sha256:3a7fd2dffb705d4d0efaed4306a704c89b9dee850b688f060a8b1615a79e5f74"},
+    {file = "typeguard-4.5.1-py3-none-any.whl", hash = "sha256:44d2bf329d49a244110a090b55f5f91aa82d9a9834ebfd30bcc73651e4a8cc40"},
+    {file = "typeguard-4.5.1.tar.gz", hash = "sha256:f6f8ecbbc819c9bc749983cc67c02391e16a9b43b8b27f15dc70ed7c4a007274"},
 ]
 
 [[package]]
