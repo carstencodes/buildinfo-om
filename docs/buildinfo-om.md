@@ -1,4 +1,4 @@
-# buildinfo-om
+# BuildInfo Data-Model
 
 ## Data Model classes
 
