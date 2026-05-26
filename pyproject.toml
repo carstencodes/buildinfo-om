@@ -56,6 +56,13 @@ cmd = "mkdocs build -c -s -v"
 [tool.pdm.scripts.docs.env]
 PYTHONPATH = "./util/griffe"
 
+[tool.pdm.scripts.docs-new]
+cmd = "zensical build"
+
+[tool.pdm.scripts.docs-new.env]
+PYTHONPATH = "./util/griffe"
+
+
 [tool.pdm.scripts.servedocs]
 cmd = "python -m http.server 8080 -d ./site"
 
