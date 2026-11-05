@@ -5,7 +5,7 @@
 groups = ["default", "build", "checkstyle", "docs", "formatting", "release", "static-code-analysis", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.1"
-content_hash = "sha256:d58e5767253ee592f0dd150602d9474bb1417cad6b0aae8684831e3d41538536"
+content_hash = "sha256:170d76b6f42000842da3a0b4c8410439b1f50f52824b5897cb22228de450ea08"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -557,7 +557,7 @@ files = [
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.88.0"
+version = "0.89.0"
 requires_python = ">=3.10"
 summary = "Datamodel Code Generator"
 groups = ["build"]
@@ -577,25 +577,25 @@ dependencies = [
     "typing-extensions<5,>=4.16",
 ]
 files = [
-    {file = "datamodel_code_generator-0.88.0-py3-none-any.whl", hash = "sha256:7efca05a350bdee6759d2761d4fc8f9233781f99bb1bc8d7110f3e816bfafd2e"},
-    {file = "datamodel_code_generator-0.88.0.tar.gz", hash = "sha256:c44729fd1fa6fa011a916329bc4443fb4774b03f777a39846dd5fe5ac6a0bfd7"},
+    {file = "datamodel_code_generator-0.89.0-py3-none-any.whl", hash = "sha256:18b077547244dfc5679057471e30a1170e048e8b4dc7b4871c6d3ef9cc8b8716"},
+    {file = "datamodel_code_generator-0.89.0.tar.gz", hash = "sha256:c7001dc4f9f98b3d31f08f31212348e2a0686b45d17a0949ae6e24931d583762"},
 ]
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.88.0"
+version = "0.89.0"
 extras = ["http"]
 requires_python = ">=3.10"
 summary = "Datamodel Code Generator"
 groups = ["build"]
 dependencies = [
     "certifi>=2026.10.19",
-    "datamodel-code-generator==0.88.0",
+    "datamodel-code-generator==0.89.0",
     "httpx>=0.24.1",
 ]
 files = [
-    {file = "datamodel_code_generator-0.88.0-py3-none-any.whl", hash = "sha256:7efca05a350bdee6759d2761d4fc8f9233781f99bb1bc8d7110f3e816bfafd2e"},
-    {file = "datamodel_code_generator-0.88.0.tar.gz", hash = "sha256:c44729fd1fa6fa011a916329bc4443fb4774b03f777a39846dd5fe5ac6a0bfd7"},
+    {file = "datamodel_code_generator-0.89.0-py3-none-any.whl", hash = "sha256:18b077547244dfc5679057471e30a1170e048e8b4dc7b4871c6d3ef9cc8b8716"},
+    {file = "datamodel_code_generator-0.89.0.tar.gz", hash = "sha256:c7001dc4f9f98b3d31f08f31212348e2a0686b45d17a0949ae6e24931d583762"},
 ]
 
 [[package]]
@@ -2441,7 +2441,7 @@ files = [
 
 [[package]]
 name = "typing-inspection"
-version = "0.4.4"
+version = "0.4.5"
 requires_python = ">=3.10"
 summary = "Runtime typing introspection tools"
 groups = ["build"]
@@ -2449,8 +2449,8 @@ dependencies = [
     "typing-extensions>=4.15.0",
 ]
 files = [
-    {file = "typing_inspection-0.4.4-py3-none-any.whl", hash = "sha256:65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147"},
-    {file = "typing_inspection-0.4.4.tar.gz", hash = "sha256:547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47"},
+    {file = "typing_inspection-0.4.5-py3-none-any.whl", hash = "sha256:bc210535442b39e1bf2805e0c7a17dfd6a4ace760c84c7f7d16245d23a6b1c39"},
+    {file = "typing_inspection-0.4.5.tar.gz", hash = "sha256:7f16c411e7930dc79596d42ab44672a3fe5f60eb34b781a1647e7872363120c7"},
 ]
 
 [[package]]
