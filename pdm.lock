@@ -5,7 +5,7 @@
 groups = ["default", "build", "checkstyle", "docs", "formatting", "release", "static-code-analysis", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.1"
-content_hash = "sha256:3f414b96aebd9e5903ec955e8b4c42013eaabe555cf687bfc7882ba2e134ff76"
+content_hash = "sha256:1aec54393cf706d96b1dcfeaadaa8bcd57230135146c1f6282f76b4a3a2a75d8"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -557,7 +557,7 @@ files = [
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.95.0"
+version = "0.96.0"
 requires_python = ">=3.11"
 summary = "Datamodel Code Generator"
 groups = ["build"]
@@ -576,25 +576,25 @@ dependencies = [
     "typing-extensions<5,>=4.16",
 ]
 files = [
-    {file = "datamodel_code_generator-0.95.0-py3-none-any.whl", hash = "sha256:7b5d5071de4f66c60ed56c2232338bb8db888dd308bb1ac9611104184ee271cd"},
-    {file = "datamodel_code_generator-0.95.0.tar.gz", hash = "sha256:81971c2cb0a219d5cbcd98b25fc9d6045cdd781bd85ae6416cacc39c2bf2373d"},
+    {file = "datamodel_code_generator-0.96.0-py3-none-any.whl", hash = "sha256:e20cef521142283c4bc0fd695d44379dcd912475e654a9a2d3003064da9f14f1"},
+    {file = "datamodel_code_generator-0.96.0.tar.gz", hash = "sha256:2f5ac503a569bdc545ea557e3e414b18516e907597fc9fd4568b6ff24f77fef3"},
 ]
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.95.0"
+version = "0.96.0"
 extras = ["http"]
 requires_python = ">=3.11"
 summary = "Datamodel Code Generator"
 groups = ["build"]
 dependencies = [
     "certifi>=2026.10.19",
-    "datamodel-code-generator==0.95.0",
+    "datamodel-code-generator==0.96.0",
     "httpx>=0.24.1",
 ]
 files = [
-    {file = "datamodel_code_generator-0.95.0-py3-none-any.whl", hash = "sha256:7b5d5071de4f66c60ed56c2232338bb8db888dd308bb1ac9611104184ee271cd"},
-    {file = "datamodel_code_generator-0.95.0.tar.gz", hash = "sha256:81971c2cb0a219d5cbcd98b25fc9d6045cdd781bd85ae6416cacc39c2bf2373d"},
+    {file = "datamodel_code_generator-0.96.0-py3-none-any.whl", hash = "sha256:e20cef521142283c4bc0fd695d44379dcd912475e654a9a2d3003064da9f14f1"},
+    {file = "datamodel_code_generator-0.96.0.tar.gz", hash = "sha256:2f5ac503a569bdc545ea557e3e414b18516e907597fc9fd4568b6ff24f77fef3"},
 ]
 
 [[package]]
